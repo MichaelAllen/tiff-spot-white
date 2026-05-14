@@ -11,6 +11,7 @@ if [[ -x "$ROOT/.venv/bin/python" ]]; then
   PYTHON="$ROOT/.venv/bin/python"
 fi
 
+"$PYTHON" -m pip install --upgrade pip setuptools wheel
 "$PYTHON" -m pip install --no-build-isolation -e ".[build]"
 "$PYTHON" -m PyInstaller --clean --noconfirm packaging/pyinstaller/tiff_spot_white.spec
 "$ROOT/dist/Tiff Spot White" --self-test

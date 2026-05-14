@@ -11,6 +11,7 @@ if (Test-Path $VenvPython) {
     $Python = $VenvPython
 }
 
+& $Python -m pip install --upgrade pip setuptools wheel
 & $Python -m pip install --no-build-isolation -e ".[build]"
 & $Python -m PyInstaller --clean --noconfirm packaging\pyinstaller\tiff_spot_white.spec
 & (Join-Path $Root "dist\Tiff Spot White.exe") --self-test
