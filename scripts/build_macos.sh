@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+export PYINSTALLER_CONFIG_DIR="$ROOT/build/pyinstaller-cache"
+
 python -m pip install -e ".[build]"
 python -m PyInstaller --clean --noconfirm packaging/pyinstaller/tiff_spot_white.spec
 "$ROOT/dist/Tiff Spot White" --self-test

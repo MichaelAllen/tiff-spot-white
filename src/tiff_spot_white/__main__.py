@@ -10,8 +10,8 @@ from pathlib import Path
 import numpy as np
 import tifffile
 
-from . import __version__
-from .core import convert_image, decode_photoshop_spot_channel, generate_spot_mask, load_image
+from tiff_spot_white import __version__
+from tiff_spot_white.core import convert_image, decode_photoshop_spot_channel, generate_spot_mask, load_image
 
 
 def self_test() -> list[str]:
@@ -77,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"- {check}")
         return 0
 
-    from .gui import main as gui_main
+    from tiff_spot_white.gui import main as gui_main
 
     return gui_main()
 

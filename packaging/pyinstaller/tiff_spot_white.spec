@@ -11,11 +11,17 @@ datas = []
 binaries = []
 hiddenimports = []
 
-for package in ("PIL", "PySide6", "imagecodecs", "tifffile"):
+for package in ("PIL", "imagecodecs", "tifffile"):
     package_datas, package_binaries, package_hiddenimports = collect_all(package)
     datas += package_datas
     binaries += package_binaries
     hiddenimports += package_hiddenimports
+
+hiddenimports += [
+    "PySide6.QtCore",
+    "PySide6.QtGui",
+    "PySide6.QtWidgets",
+]
 
 a = Analysis(
     [str(ENTRYPOINT)],
