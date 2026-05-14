@@ -27,11 +27,11 @@ py -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-## Build Single-File Executables
+## Build Executables
 
 macOS builds must be created on macOS, and Windows builds must be created on
 Windows. The build scripts install PyInstaller into the active Python
-environment, build the one-file executable, then run a bundled smoke test.
+environment, build the executable, then run a bundled smoke test.
 
 macOS:
 
@@ -48,11 +48,15 @@ Windows:
 Outputs:
 
 ```text
-dist/Tiff Spot White
+dist/Tiff Spot White.app
 dist/Tiff Spot White.exe
 ```
 
-The executable also supports:
+The raw macOS executable is also emitted as `dist/Tiff Spot White`, but launch
+the `.app` bundle from Finder to avoid opening Terminal. The raw executable is
+kept for command-line smoke tests.
+
+The executable entrypoint supports:
 
 ```bash
 "dist/Tiff Spot White" --version

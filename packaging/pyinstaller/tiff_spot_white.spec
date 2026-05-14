@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import sys
 from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_all
@@ -58,3 +59,16 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
+if sys.platform == "darwin":
+    app = BUNDLE(
+        exe,
+        name="Tiff Spot White.app",
+        icon=None,
+        bundle_identifier="net.vulpinesolutions.tiff-spot-white",
+        info_plist={
+            "CFBundleDisplayName": "Tiff Spot White",
+            "CFBundleName": "Tiff Spot White",
+            "NSHighResolutionCapable": True,
+        },
+    )

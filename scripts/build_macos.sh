@@ -16,3 +16,4 @@ fi
 "$ROOT/dist/Tiff Spot White" --self-test
 
 echo "Built: $ROOT/dist/Tiff Spot White"
+echo "Built app bundle: $ROOT/dist/Tiff Spot White.app"
