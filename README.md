@@ -27,6 +27,38 @@ py -m venv .venv
 .venv/bin/python -m pytest
 ```
 
+## Build Single-File Executables
+
+macOS builds must be created on macOS, and Windows builds must be created on
+Windows. The build scripts install PyInstaller into the active Python
+environment, build the one-file executable, then run a bundled smoke test.
+
+macOS:
+
+```bash
+scripts/build_macos.sh
+```
+
+Windows:
+
+```powershell
+.\scripts\build_windows.ps1
+```
+
+Outputs:
+
+```text
+dist/Tiff Spot White
+dist/Tiff Spot White.exe
+```
+
+The executable also supports:
+
+```bash
+"dist/Tiff Spot White" --version
+"dist/Tiff Spot White" --self-test
+```
+
 ## Notes
 
 The writer stores the spot mask as an additional TIFF channel and adds TIFF ink
