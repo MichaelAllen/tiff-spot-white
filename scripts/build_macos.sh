@@ -14,7 +14,7 @@ fi
 "$PYTHON" -m pip install --upgrade pip setuptools wheel
 "$PYTHON" -m pip install --no-build-isolation -e ".[build]"
 "$PYTHON" -m PyInstaller --clean --noconfirm packaging/pyinstaller/tiff_spot_white.spec
-"$ROOT/dist/Tiff Spot White" --self-test
+"$ROOT/dist/Tiff Spot White/Tiff Spot White" --self-test
 
-echo "Built: $ROOT/dist/Tiff Spot White"
+echo "Built executable: $ROOT/dist/Tiff Spot White/Tiff Spot White"
 echo "Built app bundle: $ROOT/dist/Tiff Spot White.app"

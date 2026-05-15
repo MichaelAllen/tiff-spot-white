@@ -42,8 +42,6 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
     name="Tiff Spot White",
     debug=False,
@@ -58,11 +56,22 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    exclude_binaries=True,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name="Tiff Spot White",
 )
 
 if sys.platform == "darwin":
     app = BUNDLE(
-        exe,
+        coll,
         name="Tiff Spot White.app",
         icon=None,
         bundle_identifier="net.vulpinesolutions.tiff-spot-white",

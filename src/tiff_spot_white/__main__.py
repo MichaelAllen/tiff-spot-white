@@ -7,14 +7,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-import numpy as np
-import tifffile
-
 from tiff_spot_white import __version__
-from tiff_spot_white.core import convert_image, decode_photoshop_spot_channel, generate_spot_mask, load_image
 
 
 def self_test() -> list[str]:
+    import numpy as np
+    import tifffile
+
+    from tiff_spot_white.core import convert_image, decode_photoshop_spot_channel, generate_spot_mask, load_image
+
     checks: list[str] = []
     with tempfile.TemporaryDirectory(prefix="tiff-spot-white-") as tmp:
         workdir = Path(tmp)

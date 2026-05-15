@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import numpy as np
-from PIL import Image
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QDragEnterEvent, QDropEvent, QImage, QPixmap
 from PySide6.QtWidgets import (
@@ -24,10 +23,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from .core import ConversionResult, LoadedImage, convert_image, default_output_path, generate_spot_mask, load_image
+if TYPE_CHECKING:
+    import numpy as np
+
+    from .core import ConversionResult, LoadedImage
 
 
 def supported_image_extensions() -> set[str]:
+    from PIL import Image
+
     Image.init()
     return {extension.lower() for extension in Image.registered_extensions()}
 
@@ -49,6 +53,8 @@ class Processor(QThread):
         self.action = action
 
     def run(self) -> None:
+        from .core import convert_image
+
         try:
             self.finished_ok.emit(convert_image(self.input_path, self.output_path, self.action))
         except Exception as exc:
@@ -139,6 +145,8 @@ class MainWindow(QMainWindow):
             self.open_file(Path(filename))
 
     def open_file(self, path: Path) -> None:
+        from .core import default_output_path, load_image
+
         if path.suffix.lower() not in supported_image_extensions():
             self.log("Choose an image file supported by Pillow.")
             return
@@ -161,6 +169,11 @@ class MainWindow(QMainWindow):
         self.refresh_preview()
 
     def _preview_rgb(self) -> np.ndarray | None:
+        import numpy as np
+        from PIL import Image
+
+        from .core import generate_spot_mask
+
         if self.loaded is None:
             return None
         cmyk = self.loaded.cmyk
