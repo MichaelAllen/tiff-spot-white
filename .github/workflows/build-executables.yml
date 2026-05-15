@@ -53,4 +53,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tiff-spot-white-windows
-          path: dist/Tiff Spot White.exe
+          path: dist/Tiff Spot White/Tiff Spot White.exe
