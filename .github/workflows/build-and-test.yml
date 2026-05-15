@@ -1,4 +1,4 @@
-name: Build executables
+name: Build and test
 
 on:
   workflow_dispatch:
@@ -32,25 +32,7 @@ jobs:
         if: runner.os == 'macOS'
         run: bash scripts/build_macos.sh
 
-      - name: Package macOS app bundle
-        if: runner.os == 'macOS'
-        run: ditto -c -k --sequesterRsrc --keepParent "dist/Tiff Spot White.app" "dist/tiff-spot-white-macos.zip"
-
       - name: Build Windows executable
         if: runner.os == 'Windows'
         shell: pwsh
         run: .\scripts\build_windows.ps1
-
-      - name: Upload macOS app bundle
-        if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tiff-spot-white-macos
-          path: dist/tiff-spot-white-macos.zip
-
-      - name: Upload Windows executable
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tiff-spot-white-windows
-          path: dist/Tiff Spot White/Tiff Spot White.exe

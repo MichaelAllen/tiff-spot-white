@@ -49,7 +49,7 @@ Outputs:
 
 ```text
 dist/Tiff Spot White.app
-dist/Tiff Spot White.exe
+dist/Tiff Spot White/Tiff Spot White.exe
 ```
 
 The raw macOS executable is also emitted as `dist/Tiff Spot White`, but launch
@@ -62,6 +62,18 @@ The executable entrypoint supports:
 "dist/Tiff Spot White" --version
 "dist/Tiff Spot White" --self-test
 ```
+
+## GitHub Actions
+
+The `Build and test` workflow runs on pushes to `main`, pull requests, and
+manual dispatch. It runs tests and verifies the macOS/Windows builds, but does
+not upload executables.
+
+The `Create release` workflow runs when a `v*` tag is pushed, or manually with a
+tag name. It builds both platforms, packages the macOS `.app` bundle as
+`tiff-spot-white-macos.zip`, copies the Windows executable to
+`tiff-spot-white-windows.exe`, creates a GitHub Release, and uploads both
+assets.
 
 ## Notes
 
