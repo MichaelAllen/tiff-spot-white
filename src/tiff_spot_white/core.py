@@ -100,9 +100,18 @@ def _read_resolution(page: tifffile.TiffPage) -> tuple[tuple[float, float] | Non
     return None, int(unit) if unit else None
 
 
+def _pillow_resolution(image: Image.Image) -> tuple[tuple[float, float] | None, int | None]:
+    dpi = image.info.get("dpi")
+    if isinstance(dpi, tuple) and len(dpi) >= 2 and dpi[0] and dpi[1]:
+        return (float(dpi[0]), float(dpi[1])), 2
+    return None, None
+
+
 def load_image(path: Path) -> LoadedImage:
     warnings: list[str] = []
     path = Path(path)
+    resolution: tuple[float, float] | None = None
+    resolution_unit: int | None = None
     try:
         with tifffile.TiffFile(path) as tif:
             if len(tif.pages) > 1:
@@ -151,6 +160,8 @@ def load_image(path: Path) -> LoadedImage:
         if getattr(image, "n_frames", 1) > 1:
             warnings.append("Input is a multi-page image. Only the first page will be processed.")
         image.seek(0)
+        if resolution is None:
+            resolution, resolution_unit = _pillow_resolution(image)
         alpha_image = image.getchannel("A") if "A" in image.getbands() else None
         if alpha_image is None:
             warnings.append("Input has no alpha channel. Full opacity alpha will be used.")
@@ -158,7 +169,14 @@ def load_image(path: Path) -> LoadedImage:
         else:
             alpha = np.asarray(alpha_image, dtype=np.uint8)
         cmyk = np.asarray(image.convert("CMYK"), dtype=np.uint8)
-    return LoadedImage(path=path, cmyk=cmyk, alpha=alpha, warnings=warnings)
+    return LoadedImage(
+        path=path,
+        cmyk=cmyk,
+        alpha=alpha,
+        resolution=resolution,
+        resolution_unit=resolution_unit,
+        warnings=warnings,
+    )
 
 
 def _ink_names(names: list[str]) -> bytes:

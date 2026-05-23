@@ -141,6 +141,25 @@ def test_non_cmyk_conversion_warning(tmp_path: Path) -> None:
     assert any("not CMYK" in warning for warning in loaded.warnings)
 
 
+def test_non_cmyk_tiff_conversion_preserves_resolution(tmp_path: Path) -> None:
+    from PIL import Image
+
+    source = tmp_path / "rgb.tiff"
+    output = tmp_path / "rgb_spotwhite.tiff"
+    Image.new("RGBA", (3600, 3000), (255, 255, 255, 128)).save(source, dpi=(300, 300))
+
+    loaded = load_image(source)
+    result = convert_image(source, output)
+
+    assert loaded.resolution == (300.0, 300.0)
+    assert loaded.resolution_unit == 2
+    with tifffile.TiffFile(result.output_path) as tif:
+        page = tif.pages[0]
+        assert page.tags["XResolution"].value == (300, 1)
+        assert page.tags["YResolution"].value == (300, 1)
+        assert int(page.tags["ResolutionUnit"].value) == 2
+
+
 def test_real_cmyk_fixture_conversion_preserves_data_and_metadata(tmp_path: Path) -> None:
     source = Path("tests/images/test1.tiff")
     if not source.exists():
