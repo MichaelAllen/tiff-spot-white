@@ -7,6 +7,7 @@ import pytest
 import tifffile
 
 from tiff_spot_white.core import (
+    clear_transparent_cmyk,
     convert_image,
     decode_photoshop_spot_channel,
     default_output_path,
@@ -57,6 +58,25 @@ def test_photoshop_spot_channel_uses_inverse_storage_polarity() -> None:
     np.testing.assert_array_equal(decode_photoshop_spot_channel(stored), logical)
 
 
+def test_clear_transparent_cmyk_only_zeros_fully_transparent_pixels() -> None:
+    cmyk = np.array(
+        [
+            [[9, 8, 7, 6], [1, 2, 3, 4]],
+            [[5, 6, 7, 8], [0, 0, 0, 0]],
+        ],
+        dtype=np.uint8,
+    )
+    alpha = np.array([[255, 0], [128, 0]], dtype=np.uint8)
+
+    cleared = clear_transparent_cmyk(cmyk, alpha)
+
+    assert cleared.tolist() == [
+        [[9, 8, 7, 6], [0, 0, 0, 0]],
+        [[5, 6, 7, 8], [0, 0, 0, 0]],
+    ]
+    np.testing.assert_array_equal(cmyk[0, 1], [1, 2, 3, 4])
+
+
 def test_default_output_path() -> None:
     assert default_output_path(Path("/tmp/file.tiff")) == Path("/tmp/file_spotwhite.tiff")
 
@@ -78,10 +98,13 @@ def test_convert_preserves_cmyk_alpha_and_spot_values(tmp_path: Path) -> None:
     with tifffile.TiffFile(result.output_path) as tif:
         out = tif.pages[0].asarray()
         assert out.shape == (2, 3, 6)
-        np.testing.assert_array_equal(out[..., :4], data[..., :4])
+        expected_cmyk = data[..., :4].copy()
+        expected_cmyk[data[..., 4] == 0] = 0
+        np.testing.assert_array_equal(out[..., :4], expected_cmyk)
         np.testing.assert_array_equal(out[..., 4], data[..., 4])
         assert out[..., 5].tolist() == [[0, 255, 255], [255, 255, 255]]
         assert decode_photoshop_spot_channel(out[..., 5]).tolist() == [[255, 0, 0], [0, 0, 0]]
+        assert "CMYK data preserved with transparent pixels cleared." in result.validation
         assert "Photoshop spot metadata present." in result.validation
 
 
@@ -166,6 +189,7 @@ def test_real_cmyk_fixture_conversion_preserves_data_and_metadata(tmp_path: Path
         pytest.skip("real TIFF fixture is not available")
     loaded = load_image(source)
     expected_spot = generate_spot_mask(loaded.cmyk, loaded.alpha)
+    expected_cmyk = clear_transparent_cmyk(loaded.cmyk, loaded.alpha)
 
     result = convert_image(source, tmp_path / "test1_spotwhite.tiff")
 
@@ -174,7 +198,7 @@ def test_real_cmyk_fixture_conversion_preserves_data_and_metadata(tmp_path: Path
     with tifffile.TiffFile(result.output_path) as tif:
         page = tif.pages[0]
         out = page.asarray()
-        np.testing.assert_array_equal(out[..., :4], loaded.cmyk)
+        np.testing.assert_array_equal(out[..., :4], expected_cmyk)
         np.testing.assert_array_equal(out[..., 4], loaded.alpha)
         np.testing.assert_array_equal(decode_photoshop_spot_channel(out[..., -1]), expected_spot)
         assert int(page.tags["Compression"].value) == 1

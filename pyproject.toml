@@ -1,6 +1,6 @@
 [project]
 name = "tiff-spot-white"
-version = "1.0.2"
+version = "1.0.3"
 description = "Desktop TIFF spot-white channel generator"
 requires-python = ">=3.10"
 dependencies = [

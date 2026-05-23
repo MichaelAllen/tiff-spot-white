@@ -67,6 +67,16 @@ def generate_spot_mask(cmyk: np.ndarray, alpha: np.ndarray) -> np.ndarray:
     return np.where(exact_white & (alpha > 0), alpha, 0).astype(np.uint8)
 
 
+def clear_transparent_cmyk(cmyk: np.ndarray, alpha: np.ndarray) -> np.ndarray:
+    if cmyk.ndim != 3 or cmyk.shape[-1] != 4:
+        raise ValueError("CMYK data must have shape height x width x 4.")
+    if alpha.shape != cmyk.shape[:2]:
+        raise ValueError("Alpha channel shape must match CMYK dimensions.")
+    output = cmyk.copy()
+    output[alpha == 0] = 0
+    return output
+
+
 def encode_photoshop_spot_channel(logical_spot: np.ndarray) -> np.ndarray:
     """Encode logical ink coverage for Photoshop/RIP spot channel polarity.
 
@@ -227,7 +237,8 @@ def convert_image(
         extra_names.append("Alpha")
     extra_names.append(spot_name)
     output_resources = merge_spot_resources(image.image_resources, extra_names, spot_name)
-    channels = [image.cmyk, image.alpha[..., None]]
+    output_cmyk = clear_transparent_cmyk(image.cmyk, image.alpha)
+    channels = [output_cmyk, image.alpha[..., None]]
     channels.extend(extra[..., None] for extra in image.extras)
     channels.append(stored_spot[..., None])
     data = np.concatenate(channels, axis=-1)
@@ -248,13 +259,19 @@ def convert_image(
         resolutionunit=image.resolution_unit,
         extratags=_extratags(image, output_resources, ink_names),
     )
-    validation = validate_output(image, output, spot, spot_name)
+    validation = validate_output(image, output, output_cmyk, spot, spot_name)
     if not any("Photoshop spot metadata present" in item for item in validation):
         warnings.append("Could not confidently verify Photoshop-compatible spot metadata. Confirm in Photoshop or RIP software.")
     return ConversionResult(output, spot_name, warnings, validation)
 
 
-def validate_output(source: LoadedImage, output_path: Path, expected_spot: np.ndarray, spot_name: str) -> list[str]:
+def validate_output(
+    source: LoadedImage,
+    output_path: Path,
+    expected_cmyk: np.ndarray,
+    expected_spot: np.ndarray,
+    spot_name: str,
+) -> list[str]:
     checks: list[str] = []
     if not output_path.exists():
         return ["Output file was not created."]
@@ -264,8 +281,8 @@ def validate_output(source: LoadedImage, output_path: Path, expected_spot: np.nd
         arr = page.asarray()
         if arr.shape[:2] == source.shape:
             checks.append("Dimensions match input first page.")
-        if np.array_equal(arr[..., :4], source.cmyk):
-            checks.append("CMYK data preserved.")
+        if np.array_equal(arr[..., :4], expected_cmyk):
+            checks.append("CMYK data preserved with transparent pixels cleared.")
         if np.array_equal(arr[..., 4], source.alpha):
             checks.append("Alpha channel preserved.")
         if np.array_equal(decode_photoshop_spot_channel(arr[..., -1]), expected_spot):
