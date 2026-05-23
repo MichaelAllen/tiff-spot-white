@@ -118,7 +118,7 @@ def parse_alpha_identifiers(data: bytes | None) -> list[int]:
     return ids
 
 
-def pack_display_info_float(channel_kinds: list[int], spot_index: int, solidity_percent: int = 50) -> bytes:
+def pack_display_info_float(channel_kinds: list[int], spot_index: int, solidity_percent: int = 100) -> bytes:
     records = [struct.pack(">I", 1)]
     for index, kind in enumerate(channel_kinds):
         if index == spot_index:
