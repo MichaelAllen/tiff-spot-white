@@ -23,8 +23,8 @@ This repo is a small Python desktop application named **TIFF Spot White**. It ad
 - `tests/test_gui.py`: lightweight GUI helper tests.
 - `packaging/pyinstaller/tiff_spot_white.spec`: PyInstaller config for macOS app bundle and Windows exe.
 - `scripts/build_macos.sh` and `scripts/build_windows.ps1`: platform build scripts that install build deps, run PyInstaller, then run the bundled self-test.
-- `.github/workflows/build-executables.yml`: CI matrix for macOS and Windows, running tests and platform builds without uploading artifacts.
-- `.github/workflows/release.yml`: release workflow that builds both platforms, packages release assets, and creates a GitHub Release.
+- `.github/workflows/build-and-test.yml`: CI matrix for macOS and Windows, running tests and platform builds without uploading artifacts.
+- `.github/workflows/create-release.yml`: release workflow that builds both platforms, packages release assets, and creates a GitHub Release.
 
 ## GitHub And CI
 
@@ -122,7 +122,7 @@ Build Windows from Windows:
 - `dist/`, `build/`, `.venv/`, `.pytest_cache/`, and `__pycache__/` are generated/local artifacts.
 - Build scripts may install dependencies into the active Python environment.
 - macOS builds produce both `dist/Tiff Spot White/Tiff Spot White` for smoke tests and `dist/Tiff Spot White.app` for user launch.
-- Windows builds produce `dist/Tiff Spot White/Tiff Spot White.exe`.
+- Windows builds produce onefile executable `dist/Tiff Spot White.exe`.
 - The release workflow copies the Windows executable to `dist/tiff-spot-white-windows.exe` before uploading it.
 
 ## Practical Development Notes

@@ -49,7 +49,7 @@ Outputs:
 
 ```text
 dist/Tiff Spot White.app
-dist/Tiff Spot White/Tiff Spot White.exe
+dist/Tiff Spot White.exe
 ```
 
 The raw macOS executable is also emitted as `dist/Tiff Spot White`, but launch
@@ -71,7 +71,7 @@ not upload executables.
 
 The `Create release` workflow runs when a `v*` tag is pushed, or manually with a
 tag name. It builds both platforms, packages the macOS `.app` bundle as
-`tiff-spot-white-macos.zip`, copies the Windows executable to
+`tiff-spot-white-macos.zip`, copies the Windows onefile executable to
 `tiff-spot-white-windows.exe`, creates a GitHub Release, and uploads both
 assets.
 

@@ -57,7 +57,7 @@ jobs:
       - name: Package Windows executable
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Copy-Item "dist\Tiff Spot White\Tiff Spot White.exe" "dist\tiff-spot-white-windows.exe"
+        run: Copy-Item "dist\Tiff Spot White.exe" "dist\tiff-spot-white-windows.exe"
 
       - name: Upload macOS release asset
         if: runner.os == 'macOS'
